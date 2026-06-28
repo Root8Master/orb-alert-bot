@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: orb-alert-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn src.web:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.9"
+      - key: UPSTOX_MOBILE
+        sync: false
+      - key: UPSTOX_PASSWORD
+        sync: false
+      - key: UPSTOX_PIN
+        sync: false
+      - key: UPSTOX_TOTP_SECRET
+        sync: false
+      - key: UPSTOX_CLIENT_ID
+        sync: false
+      - key: UPSTOX_CLIENT_SECRET
+        sync: false
+      - key: UPSTOX_REDIRECT_URI
+        sync: false
+      - key: UPSTOX_ACCESS_TOKEN
+        value: ""
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: GOOGLE_SHEET_ID
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: INTERVAL_SECONDS
+        value: "300"
+      - key: MARKET_OPEN_HHMM
+        value: "09:15"
+      - key: MARKET_CLOSE_HHMM
+        value: "11:00"
+      - key: HEARTBEAT_MINUTES
+        value: "60"
+      - key: PAPER_SL_PCT
+        value: "0.008"
+      - key: PAPER_TGT_PCT
+        value: "0.015"
+      - key: GAP_UP_FILTER_PCT
+        value: "0.02"

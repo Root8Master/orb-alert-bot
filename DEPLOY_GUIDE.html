@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORB Alert Bot — Deploy Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --bg:        #0d0f12;
+    --surface:   #13171e;
+    --border:    #1e2530;
+    --green:     #00d46a;
+    --green-dim: #00d46a22;
+    --amber:     #f5a623;
+    --amber-dim: #f5a62318;
+    --red:       #ff4757;
+    --blue:      #4a9eff;
+    --blue-dim:  #4a9eff18;
+    --text:      #c8d0dc;
+    --muted:     #5a6478;
+    --white:     #eef1f6;
+    --mono:      'JetBrains Mono', monospace;
+    --sans:      'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .shell {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ── Sidebar ── */
+  nav {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 28px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .nav-logo {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .nav-logo .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--green);
+    background: var(--green-dim);
+    border: 1px solid var(--green);
+    padding: 2px 8px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-bottom: 6px;
+    letter-spacing: 0.08em;
+  }
+
+  .nav-logo h2 {
+    color: var(--white);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 500;
+    transition: color 0.15s, background 0.15s;
+    border-left: 2px solid transparent;
+  }
+
+  nav a:hover { color: var(--text); background: var(--border); }
+  nav a.active { color: var(--green); border-left-color: var(--green); background: var(--green-dim); }
+
+  .nav-section {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 16px 20px 6px;
+  }
+
+  /* ── Main ── */
+  main {
+    padding: 48px 56px;
+    max-width: 860px;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    margin-bottom: 48px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--green);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .hero h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 14px;
+  }
+
+  .hero p { color: var(--text); max-width: 560px; }
+
+  /* Schedule timeline */
+  .schedule {
+    display: flex;
+    gap: 0;
+    margin-top: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .sched-item {
+    flex: 1;
+    padding: 14px 12px;
+    border-right: 1px solid var(--border);
+    text-align: center;
+  }
+  .sched-item:last-child { border-right: none; }
+
+  .sched-time {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--amber);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .sched-label {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.3;
+  }
+
+  /* ── Steps ── */
+  .step {
+    margin-bottom: 44px;
+    scroll-margin-top: 24px;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--green-dim);
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .step h2 {
+    color: var(--white);
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  .step h3 {
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    margin: 20px 0 10px;
+  }
+
+  .step p { margin-bottom: 10px; }
+
+  /* ── Code blocks ── */
+  pre {
+    background: #080a0d;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--green);
+    border-radius: 4px;
+    padding: 16px 18px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: #a8c0a0;
+    overflow-x: auto;
+    margin: 12px 0;
+    line-height: 1.6;
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--border);
+    color: var(--green);
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+
+  pre code { background: none; padding: 0; color: inherit; }
+
+  .comment { color: var(--muted); }
+  .key     { color: #79b8ff; }
+  .val     { color: #f0a070; }
+  .str     { color: #9ece6a; }
+  .cmd     { color: var(--green); }
+
+  /* ── Callouts ── */
+  .callout {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 4px;
+    margin: 14px 0;
+    font-size: 13px;
+  }
+
+  .callout-icon { flex-shrink: 0; font-size: 15px; margin-top: 1px; }
+  .callout.warn  { background: var(--amber-dim); border: 1px solid #f5a62340; }
+  .callout.info  { background: var(--blue-dim);  border: 1px solid #4a9eff40; }
+  .callout.tip   { background: var(--green-dim); border: 1px solid #00d46a40; }
+  .callout.warn .callout-icon { color: var(--amber); }
+  .callout.info .callout-icon { color: var(--blue); }
+  .callout.tip  .callout-icon { color: var(--green); }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+
+  th {
+    text-align: left;
+    padding: 9px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  td {
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  tr:nth-child(even) td { background: #0f1318; }
+
+  td:first-child { font-family: var(--mono); font-size: 12px; color: var(--blue); }
+
+  /* ── Ol / Ul ── */
+  ol, ul { padding-left: 20px; margin: 10px 0; }
+  li { margin-bottom: 6px; }
+
+  /* ── Env var grid ── */
+  .env-grid {
+    display: grid;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 12px 0;
+  }
+
+  .env-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    background: var(--bg);
+  }
+
+  .env-key {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--blue);
+    padding: 9px 14px;
+    border-right: 1px solid var(--border);
+    background: #0f1318;
+  }
+
+  .env-val {
+    padding: 9px 14px;
+    font-size: 12.5px;
+    color: var(--text);
+  }
+
+  .env-section {
+    grid-column: 1/-1;
+    background: var(--surface);
+    padding: 5px 14px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── File tree ── */
+  .tree {
+    background: #080a0d;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px 18px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.8;
+  }
+
+  .tree .dir  { color: var(--amber); }
+  .tree .file { color: var(--text); }
+  .tree .note { color: var(--muted); }
+  .tree .new  { color: var(--green); }
+
+  /* ── Divider ── */
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  /* ── Endpoints ── */
+  .endpoint {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin: 6px 0;
+    background: var(--surface);
+  }
+
+  .method {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .method.get  { background: #4a9eff22; color: var(--blue);  border: 1px solid #4a9eff44; }
+  .method.post { background: #00d46a22; color: var(--green); border: 1px solid #00d46a44; }
+
+  .ep-path { font-family: var(--mono); font-size: 12.5px; color: var(--white); }
+  .ep-desc { margin-left: auto; color: var(--muted); font-size: 12px; }
+
+  /* ── Troubleshoot ── */
+  .trouble {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 12px 0;
+  }
+
+  .trouble-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+  .trouble-row:last-child { border-bottom: none; }
+
+  .trouble-prob {
+    padding: 11px 14px;
+    font-size: 12.5px;
+    color: var(--red);
+    border-right: 1px solid var(--border);
+    background: #0f1318;
+  }
+
+  .trouble-fix {
+    padding: 11px 14px;
+    font-size: 12.5px;
+    color: var(--text);
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ── Sidebar ── -->
+<nav>
+  <div class="nav-logo">
+    <div class="badge">v3.0</div>
+    <h2>ORB Alert Bot<br>Deploy Guide</h2>
+  </div>
+  <div class="nav-section">Setup</div>
+  <a href="#prereqs">Prerequisites</a>
+  <a href="#step1">1. Upstox App</a>
+  <a href="#step2">2. TOTP Secret</a>
+  <a href="#step3">3. Telegram Bot</a>
+  <a href="#step4">4. GitHub</a>
+  <a href="#step5">5. Google Sheets</a>
+  <a href="#step6">6. Render</a>
+  <a href="#step7">7. Run Setup</a>
+  <a href="#step8">8. UptimeRobot</a>
+  <div class="nav-section">Reference</div>
+  <a href="#schedule">Daily Schedule</a>
+  <a href="#commands">Bot Commands</a>
+  <a href="#endpoints">API Endpoints</a>
+  <a href="#files">File Structure</a>
+  <a href="#troubleshoot">Troubleshoot</a>
+</nav>
+
+<!-- ── Main ── -->
+<main>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="eyebrow">Nifty 50 + Bank Nifty · ORB Scanner</div>
+    <h1>Deploy in 8 steps.<br>Run forever for free.</h1>
+    <p>FastAPI on Render + UptimeRobot keep-alive + Upstox TOTP auto-login + Telegram alerts.
+       Fill <code>config.ini</code>, run <code>python setup.py</code>. Done.</p>
+
+    <div class="schedule">
+      <div class="sched-item">
+        <div class="sched-time">08:50</div>
+        <div class="sched-label">Token<br>Refresh</div>
+      </div>
+      <div class="sched-item">
+        <div class="sched-time">09:00</div>
+        <div class="sched-label">Pre-market<br>Watchlist</div>
+      </div>
+      <div class="sched-item">
+        <div class="sched-time">09:20</div>
+        <div class="sched-label">ORB Scan<br>Starts</div>
+      </div>
+      <div class="sched-item">
+        <div class="sched-time">09:30</div>
+        <div class="sched-label">Watchdog<br>Check</div>
+      </div>
+      <div class="sched-item">
+        <div class="sched-time">11:00</div>
+        <div class="sched-label">Scan<br>Stops</div>
+      </div>
+      <div class="sched-item">
+        <div class="sched-time">15:25</div>
+        <div class="sched-label">EOD Trade<br>Close</div>
+      </div>
+      <div class="sched-item">
+        <div class="sched-time">16:00</div>
+        <div class="sched-label">Daily<br>Summary</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prerequisites -->
+  <div class="step" id="prereqs">
+    <div class="step-header">
+      <div class="step-num">✦</div>
+      <h2>What You Need</h2>
+    </div>
+    <table>
+      <tr><th>Account</th><th>URL</th><th>Cost</th></tr>
+      <tr><td>Upstox</td><td>upstox.com + developer.upstox.com</td><td>Free (have demat)</td></tr>
+      <tr><td>Telegram</td><td>telegram.org</td><td>Free</td></tr>
+      <tr><td>GitHub</td><td>github.com</td><td>Free</td></tr>
+      <tr><td>Render</td><td>render.com</td><td>Free tier</td></tr>
+      <tr><td>UptimeRobot</td><td>uptimerobot.com</td><td>Free tier</td></tr>
+    </table>
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <span>Python 3.11+ must be installed locally. Run <code>python --version</code> to verify.</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- Step 1 -->
+  <div class="step" id="step1">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <h2>Create Upstox Developer App</h2>
+    </div>
+    <ol>
+      <li>Go to <strong>developer.upstox.com</strong> → login with Upstox credentials</li>
+      <li>Click <strong>My Apps → New App</strong></li>
+      <li>Fill in:
+        <ul>
+          <li><strong>App Name:</strong> ORB Alert Bot</li>
+          <li><strong>Redirect URL:</strong> <code>https://orb-alert-bot.onrender.com/callback</code><br>
+            <span style="color:var(--muted);font-size:12px">(Update after Step 5 once you know your Render URL)</span></li>
+        </ul>
+      </li>
+      <li>Click <strong>Create</strong></li>
+      <li>Note your <strong>API Key</strong> → this is <code>client_id</code> in config.ini</li>
+      <li>Note your <strong>API Secret</strong> → this is <code>client_secret</code> in config.ini</li>
+    </ol>
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <span>Make sure NSE EQ segment is active in your Upstox account. Open Upstox app → Profile → Segments.</span>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step" id="step2">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <h2>Get Your TOTP Secret Key</h2>
+    </div>
+    <p>This lets the bot auto-login every day at 08:50 IST — no manual action ever.</p>
+    <ol>
+      <li>Open <strong>Upstox app</strong> on phone → Profile → Settings → Two-Factor Authentication</li>
+      <li>If TOTP not enabled → enable it. The setup screen shows a QR code + secret key.</li>
+      <li>If already enabled with Google Authenticator:
+        <ul>
+          <li>Disable TOTP → re-enable</li>
+          <li>On setup screen tap <strong>"Can't scan QR?"</strong> or <strong>"Show key"</strong></li>
+        </ul>
+      </li>
+      <li>Copy the alphanumeric string — looks like <code>JBSWY3DPEHPK3PXP</code></li>
+      <li>Also scan into Google Authenticator normally — you still need it to log in manually</li>
+    </ol>
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <span>This is a one-time step. Save the key somewhere secure. You will never need to do this again.</span>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step" id="step3">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <h2>Create Telegram Bot</h2>
+    </div>
+    <ol>
+      <li>Open Telegram → search <strong>@BotFather</strong> → send <code>/newbot</code></li>
+      <li>Name: <code>ORB Alert Bot</code></li>
+      <li>Username: anything ending in <code>bot</code> e.g. <code>orb_nifty_alert_bot</code></li>
+      <li>BotFather replies with token: <code>7123456789:AAFxxxxxxxxxxxxxxx</code> → this is <code>bot_token</code></li>
+      <li>Search <strong>@userinfobot</strong> → send <code>/start</code> → copy the <code>Id:</code> number → this is <code>chat_id</code></li>
+      <li>Search your bot name → press <strong>Start</strong> (required — bot cannot message you until you do this)</li>
+    </ol>
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <span>Want alerts in a group? Add the bot to a Telegram group, then use the group's chat ID as <code>chat_id</code>.</span>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="step" id="step4">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <h2>Push Code to GitHub</h2>
+    </div>
+    <p>Extract the <code>orb_alert.zip</code> you downloaded. Open PowerShell inside the <code>orb_alert</code> folder.</p>
+    <pre><span class="comment"># Create a new GitHub repo first at github.com/new → name: orb-alert-bot</span>
+
+<span class="cmd">git init</span>
+<span class="cmd">git add .</span>
+<span class="cmd">git commit -m "ORB Alert Bot v2"</span>
+<span class="cmd">git remote add origin https://github.com/YOUR_USERNAME/orb-alert-bot.git</span>
+<span class="cmd">git branch -M main</span>
+<span class="cmd">git push -u origin main</span></pre>
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <span><code>config.ini</code> is in <code>.gitignore</code> — your credentials will never be pushed to GitHub.</span>
+    </div>
+  </div>
+
+  <!-- Step 5 - Google Sheets -->
+  <div class="step" id="step5">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <h2>Setup Google Sheets (Paper Trade Log)</h2>
+    </div>
+    <p>Trades are logged to a Google Sheet automatically — visible in real-time, no database needed.</p>
+
+    <h3>5a. Create the Google Sheet</h3>
+    <ol>
+      <li>Go to <strong>sheets.google.com</strong> → Create new spreadsheet</li>
+      <li>Name it: <code>ORB Trade Log</code></li>
+      <li>Copy the Sheet ID from the URL:<br>
+        <code>https://docs.google.com/spreadsheets/d/<span style="color:var(--amber)">THIS_PART</span>/edit</code><br>
+        That highlighted part is your <code>sheet_id</code> in config.ini</li>
+    </ol>
+
+    <h3>5b. Create a Google Cloud Service Account</h3>
+    <ol>
+      <li>Go to <strong>console.cloud.google.com</strong> → Login</li>
+      <li>Create a new project → name it <code>ORB Bot</code></li>
+      <li>Search for <strong>Google Sheets API</strong> → Enable it</li>
+      <li>Go to <strong>IAM &amp; Admin → Service Accounts → Create Service Account</strong></li>
+      <li>Name: <code>orb-bot</code> → click Create and Continue → Done</li>
+      <li>Click the service account → <strong>Keys → Add Key → Create New Key → JSON</strong></li>
+      <li>A <code>.json</code> file downloads automatically — save it as <code>service_account.json</code> inside the <code>orb_alert</code> folder</li>
+    </ol>
+
+    <h3>5c. Share the Sheet with the Service Account</h3>
+    <ol>
+      <li>Open your Google Sheet</li>
+      <li>Click <strong>Share</strong> (top right)</li>
+      <li>Open <code>service_account.json</code> — find the <code>"client_email"</code> field<br>
+        Looks like: <code>orb-bot@orb-bot-123456.iam.gserviceaccount.com</code></li>
+      <li>Paste that email into the Share dialog → Role: <strong>Editor</strong> → Share</li>
+    </ol>
+
+    <h3>5d. Update config.ini</h3>
+    <pre><span class="key">[google]</span>
+<span class="key">sheet_id</span>             = <span class="val">1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms</span>   <span class="comment"># from Sheet URL</span>
+<span class="key">service_account_json</span> = <span class="val">service_account.json</span>   <span class="comment"># file in orb_alert folder</span></pre>
+
+    <div class="callout tip">
+      <span class="callout-icon">✅</span>
+      <span><code>setup.py</code> reads the JSON file and pushes it as a single env var to Render automatically — you never paste JSON manually.</span>
+    </div>
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <span>The bot auto-creates a <strong>Trades</strong> sheet tab with headers on first run. Sheet columns: ID · Date · Time · Symbol · Index · Entry · SL · Target · Exit Price · Exit Reason · Exit Time · P&amp;L% · Status</span>
+    </div>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="step" id="step6">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <h2>Deploy to Render</h2>
+    </div>
+
+    <h3>5a. Create Web Service</h3>
+    <ol>
+      <li>Go to <strong>render.com</strong> → New → Web Service</li>
+      <li>Connect your GitHub repo</li>
+      <li>Settings:
+        <table>
+          <tr><th>Field</th><th>Value</th></tr>
+          <tr><td>Name</td><td>orb-alert-bot</td></tr>
+          <tr><td>Runtime</td><td>Python</td></tr>
+          <tr><td>Build Command</td><td><code>pip install -r requirements.txt</code></td></tr>
+          <tr><td>Start Command</td><td><code>uvicorn src.web:app --host 0.0.0.0 --port $PORT</code></td></tr>
+          <tr><td>Instance Type</td><td>Free</td></tr>
+        </table>
+      </li>
+      <li>Click <strong>Create Web Service</strong></li>
+      <li>Note your Render URL e.g. <code>orb-alert-bot.onrender.com</code></li>
+    </ol>
+
+    <h3>5b. Add Persistent Disk</h3>
+    <p>Required so paper trade SQLite DB survives Render restarts.</p>
+    <ol>
+      <li>In your service → <strong>Disks → Add Disk</strong></li>
+      <li>Name: <code>trades-db</code>, Mount Path: <code>/data</code>, Size: 1 GB</li>
+      <li>Save</li>
+    </ol>
+
+    <h3>5c. Get Render API Key + Service ID</h3>
+    <table>
+      <tr><th>Item</th><th>Where to find</th></tr>
+      <tr><td>API Key</td><td>Render → Account Settings → API Keys → Create API Key</td></tr>
+      <tr><td>Service ID</td><td>Open your service → URL shows <code>/services/srv_xxxxxxxxx</code> — copy the <code>srv_xxx</code> part</td></tr>
+    </table>
+
+    <h3>5d. Update Upstox Redirect URI</h3>
+    <p>Go back to <strong>developer.upstox.com → My Apps → Edit</strong><br>
+    Update Redirect URL to: <code>https://orb-alert-bot.onrender.com/callback</code></p>
+  </div>
+
+  <!-- Step 6 -->
+  <div class="step" id="step7">
+    <div class="step-header">
+      <div class="step-num">7</div>
+      <h2>Fill config.ini and Run setup.py</h2>
+    </div>
+    <p>Open <code>config.ini</code> in any text editor. Fill in all values:</p>
+
+    <pre><span class="comment"># ── config.ini — fill all values, then run setup.py ────</span>
+
+<span class="key">[upstox]</span>
+<span class="key">mobile</span>        = <span class="val">9876543210</span>         <span class="comment"># your 10-digit mobile</span>
+<span class="key">password</span>      = <span class="val">MyPassword123</span>      <span class="comment"># Upstox login password</span>
+<span class="key">pin</span>           = <span class="val">654321</span>             <span class="comment"># 6-digit Upstox PIN</span>
+<span class="key">totp_secret</span>   = <span class="val">JBSWY3DPEHPK3PXP</span>   <span class="comment"># from Step 2</span>
+<span class="key">client_id</span>     = <span class="val">abc123xyz</span>          <span class="comment"># API Key from Step 1</span>
+<span class="key">client_secret</span> = <span class="val">def456uvw</span>          <span class="comment"># API Secret from Step 1</span>
+
+<span class="key">[telegram]</span>
+<span class="key">bot_token</span>     = <span class="val">7123456789:AAFxxx...</span> <span class="comment"># from Step 3</span>
+<span class="key">chat_id</span>       = <span class="val">987654321</span>           <span class="comment"># from Step 3</span>
+
+<span class="key">[render]</span>
+<span class="key">api_key</span>       = <span class="val">rnd_xxxxx...</span>        <span class="comment"># from Step 5c</span>
+<span class="key">service_id</span>    = <span class="val">srv_xxxxx...</span>        <span class="comment"># from Step 5c</span>
+
+<span class="key">[scanner]</span>
+<span class="key">interval_seconds</span>  = <span class="val">300</span>
+<span class="key">market_open_hhmm</span>  = <span class="val">09:15</span>
+<span class="key">market_close_hhmm</span> = <span class="val">11:00</span>
+<span class="key">heartbeat_minutes</span> = <span class="val">60</span>
+
+<span class="key">[paper_trades]</span>
+<span class="key">sl_pct</span>   = <span class="val">0.008</span>   <span class="comment"># 0.8% stop loss</span>
+<span class="key">tgt_pct</span>  = <span class="val">0.015</span>   <span class="comment"># 1.5% target</span></pre>
+
+    <p>Then run in PowerShell from inside the <code>orb_alert</code> folder:</p>
+    <pre><span class="cmd">pip install requests</span>
+<span class="cmd">python setup.py</span></pre>
+
+    <p>The script will:</p>
+    <ol>
+      <li>Validate all fields are filled</li>
+      <li>Verify Telegram bot token is valid</li>
+      <li>Push all 16 env vars to Render via API</li>
+      <li>Trigger a redeploy</li>
+      <li>Print your service URL</li>
+    </ol>
+
+    <div class="callout tip">
+      <span class="callout-icon">✅</span>
+      <span>You should see <strong>Telegram bot OK</strong> and <strong>All env vars set on Render</strong> in the output. If not, fix the error shown before continuing.</span>
+    </div>
+  </div>
+
+  <!-- Step 7 -->
+  <div class="step" id="step8">
+    <div class="step-header">
+      <div class="step-num">8</div>
+      <h2>UptimeRobot — Keep Render Awake</h2>
+    </div>
+    <p>Render free tier sleeps after 15 min inactivity. UptimeRobot pings <code>/health</code> every 5 min.</p>
+    <ol>
+      <li>Go to <strong>uptimerobot.com</strong> → Create Free Account → Login</li>
+      <li>Click <strong>Add New Monitor</strong></li>
+      <li>Fill in:
+        <table>
+          <tr><th>Field</th><th>Value</th></tr>
+          <tr><td>Monitor Type</td><td>HTTP(s)</td></tr>
+          <tr><td>Friendly Name</td><td>ORB Bot Health</td></tr>
+          <tr><td>URL</td><td><code>https://orb-alert-bot.onrender.com/health</code></td></tr>
+          <tr><td>Monitoring Interval</td><td>5 minutes</td></tr>
+        </table>
+      </li>
+      <li>Click <strong>Create Monitor</strong></li>
+    </ol>
+    <div class="callout tip">
+      <span class="callout-icon">✅</span>
+      <span>Setup complete. Bot runs 24/7 at zero cost.</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- Daily Schedule -->
+  <div class="step" id="schedule">
+    <div class="step-header">
+      <div class="step-num">✦</div>
+      <h2>Daily Schedule (IST)</h2>
+    </div>
+    <table>
+      <tr><th>Time</th><th>Action</th><th>Telegram Message</th></tr>
+      <tr><td>08:00</td><td>Holiday check — if NSE holiday, bot sleeps all day</td><td>🗓 Holiday notice (if holiday)</td></tr>
+      <tr><td>08:50</td><td>Upstox token auto-refreshed via TOTP</td><td>—</td></tr>
+      <tr><td>09:00</td><td>Pre-market watchlist built</td><td>🔭 Top 10 by volume surge</td></tr>
+      <tr><td>09:20</td><td>ORB scan loop starts (every 5 min)</td><td>—</td></tr>
+      <tr><td>09:20–11:00</td><td>Each stock: sector filter → 7 conditions (incl. gap-up filter) → exit check</td><td>🚨 Entry + ✅/🛑 Exit alerts</td></tr>
+      <tr><td>09:30</td><td>Watchdog: warns if scanner hasn't run yet (holiday-aware)</td><td>⚠️ Silent failure alert (if triggered)</td></tr>
+      <tr><td>11:00</td><td>Scan stops</td><td>—</td></tr>
+      <tr><td>15:25</td><td>All open paper trades closed at market price</td><td>🔔 EOD exit alerts</td></tr>
+      <tr><td>16:00</td><td>Daily summary generated</td><td>📊 Win rate, P&L, trade list</td></tr>
+    </table>
+  </div>
+
+  <!-- API Endpoints -->
+  <div class="step" id="endpoints">
+    <div class="step-header">
+      <div class="step-num">✦</div>
+      <h2>API Endpoints</h2>
+    </div>
+
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="ep-path">/</span>
+      <span class="ep-desc">Status + today's signals</span>
+    </div>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="ep-path">/health</span>
+      <span class="ep-desc">UptimeRobot ping target</span>
+    </div>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="ep-path">/trades</span>
+      <span class="ep-desc">Today's paper trade log + P&L stats</span>
+    </div>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="ep-path">/run-now</span>
+      <span class="ep-desc">Trigger ORB scan immediately</span>
+    </div>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="ep-path">/run-premarket</span>
+      <span class="ep-desc">Trigger pre-market watchlist now</span>
+    </div>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="ep-path">/run-summary</span>
+      <span class="ep-desc">Trigger daily summary now</span>
+    </div>
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="ep-path">/holiday</span>
+      <span class="ep-desc">Is today a market holiday?</span>
+    </div>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="ep-path">/pause</span>
+      <span class="ep-desc">Pause scanner (same as /pause Telegram command)</span>
+    </div>
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="ep-path">/resume</span>
+      <span class="ep-desc">Resume scanner</span>
+    </div>
+  </div>
+
+  <!-- Bot Commands -->
+  <div class="step" id="commands">
+    <div class="step-header">
+      <div class="step-num">✦</div>
+      <h2>Telegram Bot Commands</h2>
+    </div>
+    <p>Send these to your bot directly in Telegram. Bot only responds to your configured <code>chat_id</code>.</p>
+    <table>
+      <tr><th>Command</th><th>Does</th></tr>
+      <tr><td>/status</td><td>Scanner state (running/paused), last scan time, signals today</td></tr>
+      <tr><td>/scan</td><td>Trigger immediate scan (works outside 09:20–11:00 window too)</td></tr>
+      <tr><td>/trades</td><td>Today's full P&amp;L table with all open and closed trades</td></tr>
+      <tr><td>/pause</td><td>Pause scanner — no alerts fire until /resume</td></tr>
+      <tr><td>/resume</td><td>Resume scanner after pause</td></tr>
+      <tr><td>/sl RELIANCE 2900</td><td>Update stop-loss on open RELIANCE trade to 2900</td></tr>
+      <tr><td>/help</td><td>List all available commands</td></tr>
+    </table>
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <span>Commands use long-polling (30s timeout) — responses arrive within seconds. No webhook setup needed.</span>
+    </div>
+  </div>
+
+  <!-- File Structure -->
+  <div class="step" id="files">
+    <div class="step-header">
+      <div class="step-num">✦</div>
+      <h2>File Structure</h2>
+    </div>
+    <div class="tree">
+<span class="dir">orb_alert/</span>
+├── <span class="file">config.ini</span>          <span class="note">← YOU fill this (never pushed to GitHub)</span>
+├── <span class="file">setup.py</span>            <span class="note">← YOU run this once</span>
+├── <span class="file">requirements.txt</span>
+├── <span class="file">render.yaml</span>
+├── <span class="file">Procfile</span>
+└── <span class="dir">src/</span>
+    ├── <span class="file">auth.py</span>             <span class="note">← TOTP auto-login, refreshes 08:50 IST daily</span>
+    ├── <span class="file">web.py</span>              <span class="note">← FastAPI orchestrator, all schedules</span>
+    ├── <span class="dir">exchange/</span>
+    │   └── <span class="file">upstox_client.py</span>   <span class="note">← Upstox v2 candle fetcher</span>
+    ├── <span class="dir">scanner/</span>
+    │   ├── <span class="new">orb_scanner.py</span>     <span class="note">← 7 conditions incl. ADX + gap-up filter</span>
+    │   ├── <span class="new">sector_filter.py</span>   <span class="note">← sector index green check, 5-min cache</span>
+    │   ├── <span class="new">premarket.py</span>       <span class="note">← 09:00 watchlist builder</span>
+    │   ├── <span class="new">holidays.py</span>        <span class="note">← NSE holiday calendar + API fallback</span>
+    │   └── <span class="new">watchdog.py</span>        <span class="note">← silent failure detector, warns by 09:30</span>
+    ├── <span class="dir">tracker/</span>
+    │   └── <span class="new">paper_trades.py</span>    <span class="note">← Google Sheets entry/exit/P&L tracker</span>
+    ├── <span class="dir">alerts/</span>
+    │   ├── <span class="file">telegram.py</span>        <span class="note">← 7 message types incl. holiday + warning</span>
+    │   ├── <span class="new">telegram_commands.py</span> <span class="note">← /status /scan /trades /pause /resume /sl</span>
+    │   └── <span class="new">dedup.py</span>           <span class="note">← persistent dedup via Google Sheet Dedup tab</span>
+    └── <span class="dir">data/</span>
+        ├── <span class="file">symbols.json</span>       <span class="note">← 50 Nifty + 12 BankNifty instrument keys</span>
+        └── <span class="new">sectors.json</span>       <span class="note">← sector → index mapping</span>
+    </div>
+    <p style="margin-top:10px;font-size:12px;color:var(--muted)"><span style="color:var(--green)">■</span> green = new in this version</p>
+  </div>
+
+  <!-- Troubleshoot -->
+  <div class="step" id="troubleshoot">
+    <div class="step-header">
+      <div class="step-num">✦</div>
+      <h2>Troubleshooting</h2>
+    </div>
+    <div class="trouble">
+      <div class="trouble-row">
+        <div class="trouble-prob">setup.py fails validation</div>
+        <div class="trouble-fix">Placeholder values still in config.ini. Replace all <code>your_xxx</code> values.</div>
+      </div>
+      <div class="trouble-row">
+        <div class="trouble-prob">Telegram bot invalid</div>
+        <div class="trouble-fix">Double-check token — no spaces, must include the colon. Start the bot first.</div>
+      </div>
+      <div class="trouble-row">
+        <div class="trouble-prob">Render 401 / 404</div>
+        <div class="trouble-fix">API key or service_id wrong. Regenerate API key in Render settings.</div>
+      </div>
+      <div class="trouble-row">
+        <div class="trouble-prob">Token refresh fails at 08:50</div>
+        <div class="trouble-fix">TOTP secret wrong. Must be raw base32 key — not a QR image, not a URL.</div>
+      </div>
+      <div class="trouble-row">
+        <div class="trouble-prob">No alerts during 09:20–11:00</div>
+        <div class="trouble-fix">Use <code>POST /run-now</code> to trigger manually and check <code>GET /</code> for errors.</div>
+      </div>
+      <div class="trouble-row">
+        <div class="trouble-prob">All stocks skipped by sector filter</div>
+        <div class="trouble-fix">Broad market red day. Expected. All sector indexes are down — scanner correctly silent.</div>
+      </div>
+      <div class="trouble-row">
+        <div class="trouble-prob">Render keeps sleeping</div>
+        <div class="trouble-fix">Check UptimeRobot monitor is active and hitting <code>/health</code> every 5 min.</div>
+      </div>
+      <div class="trouble-row">
+        <div class="trouble-prob">Trades not appearing in Sheet</div>
+        <div class="trouble-fix">Sheet not shared with service account email. Open Sheet → Share → paste <code>client_email</code> from JSON → Editor role.</div>
+      </div>
+      <div class="trouble-row">
+        <div class="trouble-prob">gspread auth error on startup</div>
+        <div class="trouble-fix"><code>GOOGLE_SERVICE_ACCOUNT_JSON</code> env var malformed. Re-run <code>setup.py</code> — it reads the file and pushes it correctly.</div>
+      </div>
+      <div class="trouble-row">
+        <div class="trouble-prob">Google Sheets API not enabled</div>
+        <div class="trouble-fix">Go to console.cloud.google.com → your project → APIs → enable Google Sheets API.</div>
+      </div>
+      <div class="trouble-row">
+        <div class="trouble-prob">NSE EQ segment error</div>
+        <div class="trouble-fix">Open Upstox app → Profile → Segments → activate NSE EQ.</div>
+      </div>
+      <div class="trouble-row">
+        <div class="trouble-prob">⚠️ Watchdog alert fires every day</div>
+        <div class="trouble-fix">Scanner not running by 09:30. Check token refresh at 08:50 — likely TOTP secret wrong or Upstox login failing.</div>
+      </div>
+      <div class="trouble-row">
+        <div class="trouble-prob">Bot scanning on market holiday</div>
+        <div class="trouble-fix">Holiday not in hardcoded list. Check <code>GET /holiday</code> — if wrong, NSE API fetch may have failed. Check Render logs.</div>
+      </div>
+      <div class="trouble-row">
+        <div class="trouble-prob">Same stock alerting twice after restart</div>
+        <div class="trouble-fix">Dedup Sheet tab missing. Check Google Sheet has a <code>Dedup</code> tab. Bot creates it automatically on first run — verify Sheets access is working.</div>
+      </div>
+      <div class="trouble-row">
+        <div class="trouble-prob">Telegram commands not responding</div>
+        <div class="trouble-fix">Did you send <code>/start</code> to the bot? Also verify <code>TELEGRAM_CHAT_ID</code> matches your actual chat ID — bot ignores other chat IDs for security.</div>
+      </div>
+      <div class="trouble-row">
+        <div class="trouble-prob">Rate limit errors in Render logs</div>
+        <div class="trouble-fix">Expected on market open — 62 stocks × 2 API calls = 124 calls/cycle. Exponential backoff handles it automatically. Errors resolve within 8–16 seconds.</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "sectors": {
+    "IT":      ["INFY", "TCS", "HCLTECH", "WIPRO", "TECHM"],
+    "BANK":    ["HDFCBANK", "ICICIBANK", "AXISBANK", "KOTAKBANK", "SBIN", "INDUSINDBK", "BANDHANBNK", "FEDERALBNK", "IDFCFIRSTB", "PNB", "AUBANK", "BANKBARODA"],
+    "AUTO":    ["MARUTI", "TATAMOTORS", "M&M", "BAJAJ-AUTO", "HEROMOTOCO", "EICHERMOT"],
+    "PHARMA":  ["SUNPHARMA", "DRREDDY", "CIPLA", "DIVISLAB", "APOLLOHOSP"],
+    "ENERGY":  ["RELIANCE", "ONGC", "BPCL", "NTPC", "POWERGRID"],
+    "METAL":   ["TATASTEEL", "HINDALCO", "JSWSTEEL", "COALINDIA"],
+    "FMCG":    ["HINDUNILVR", "ITC", "BRITANNIA", "NESTLEIND", "TATACONSUM"],
+    "FINANCE": ["BAJFINANCE", "BAJAJFINSV", "HDFCLIFE", "SBILIFE"],
+    "INFRA":   ["LT", "ADANIPORTS", "ADANIENT", "ULTRACEMCO", "GRASIM"],
+    "OTHERS":  ["ASIANPAINT", "TITAN", "ZOMATO", "UPL"]
+  },
+  "index_instruments": {
+    "NIFTY50":    "NSE_INDEX|Nifty 50",
+    "BANKNIFTY":  "NSE_INDEX|Nifty Bank",
+    "NIFTY_IT":   "NSE_INDEX|Nifty IT",
+    "NIFTY_AUTO": "NSE_INDEX|Nifty Auto",
+    "NIFTY_PHARMA": "NSE_INDEX|Nifty Pharma",
+    "NIFTY_METAL":  "NSE_INDEX|Nifty Metal",
+    "NIFTY_FMCG":   "NSE_INDEX|Nifty FMCG",
+    "NIFTY_ENERGY": "NSE_INDEX|Nifty Energy"
+  },
+  "sector_index_map": {
+    "IT":     "NIFTY_IT",
+    "BANK":   "BANKNIFTY",
+    "AUTO":   "NIFTY_AUTO",
+    "PHARMA": "NIFTY_PHARMA",
+    "METAL":  "NIFTY_METAL",
+    "FMCG":   "NIFTY_FMCG",
+    "ENERGY": "NIFTY_ENERGY"
+  }
+}
