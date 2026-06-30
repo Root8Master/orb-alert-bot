@@ -57,6 +57,16 @@ def _next_refresh_seconds() -> float:
     return (target - now).total_seconds()
 
 
+def force_refresh() -> dict:
+    """Manually trigger a refresh right now. Returns current token state after attempt."""
+    _refresh()
+    return {
+        "token_set":          bool(_TOKEN["access_token"]),
+        "refreshed_at":       _TOKEN["refreshed_at"],
+        "token_preview":      (_TOKEN["access_token"][:12] + "...") if _TOKEN["access_token"] else None,
+    }
+
+
 def start_refresh_loop():
     """
     Runs in daemon thread.

@@ -27,7 +27,7 @@ from pathlib import Path
 import pytz
 from fastapi import FastAPI
 
-from src.auth import start_refresh_loop
+from src.auth import start_refresh_loop, force_refresh
 from src.scanner.orb_scanner import scan
 from src.scanner.sector_filter import sector_is_green
 from src.scanner.premarket import build_watchlist
@@ -252,7 +252,7 @@ def startup():
 
 # ── endpoints ─────────────────────────────────────────────────
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def status():
     return {
         "status":         "running",
@@ -315,6 +315,13 @@ def pause():
 def resume():
     _cmd_module.scanner_paused = False
     return {"paused": False}
+
+
+@app.post("/auth-refresh")
+def auth_refresh():
+    """Manually trigger Upstox TOTP login right now — test without waiting for 08:50."""
+    result = force_refresh()
+    return result
 
 
 @app.get("/debug")
