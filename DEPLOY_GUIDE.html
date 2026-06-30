@@ -532,6 +532,14 @@
       <span class="callout-icon">⚠️</span>
       <span>Make sure NSE EQ segment is active in your Upstox account. Open Upstox app → Profile → Segments.</span>
     </div>
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <div>
+        <strong>Why does the bot need my password, PIN, and TOTP secret?</strong><br>
+        Upstox does not provide a server-to-server token refresh API. Every day the access token expires and <em>the only way to get a new one</em> is to complete the full login flow: mobile → password → PIN → TOTP code. The <code>upstox-totp</code> library automates this headlessly at 08:50 AM IST so you never have to do it manually. All 5 credentials are required by the library — remove any one and login fails.<br><br>
+        These values are stored as Render environment variables and are never written to disk, logged, or pushed to GitHub.
+      </div>
+    </div>
   </div>
 
   <!-- Step 2 -->
@@ -677,22 +685,14 @@
       <li>Note your Render URL e.g. <code>orb-alert-bot.onrender.com</code></li>
     </ol>
 
-    <h3>5b. Add Persistent Disk</h3>
-    <p>Required so paper trade SQLite DB survives Render restarts.</p>
-    <ol>
-      <li>In your service → <strong>Disks → Add Disk</strong></li>
-      <li>Name: <code>trades-db</code>, Mount Path: <code>/data</code>, Size: 1 GB</li>
-      <li>Save</li>
-    </ol>
-
-    <h3>5c. Get Render API Key + Service ID</h3>
+    <h3>5b. Get Render API Key + Service ID</h3>
     <table>
       <tr><th>Item</th><th>Where to find</th></tr>
       <tr><td>API Key</td><td>Render → Account Settings → API Keys → Create API Key</td></tr>
       <tr><td>Service ID</td><td>Open your service → URL shows <code>/services/srv_xxxxxxxxx</code> — copy the <code>srv_xxx</code> part</td></tr>
     </table>
 
-    <h3>5d. Update Upstox Redirect URI</h3>
+    <h3>5c. Update Upstox Redirect URI</h3>
     <p>Go back to <strong>developer.upstox.com → My Apps → Edit</strong><br>
     Update Redirect URL to: <code>https://orb-alert-bot.onrender.com/callback</code></p>
   </div>
@@ -720,8 +720,12 @@
 <span class="key">chat_id</span>       = <span class="val">987654321</span>           <span class="comment"># from Step 3</span>
 
 <span class="key">[render]</span>
-<span class="key">api_key</span>       = <span class="val">rnd_xxxxx...</span>        <span class="comment"># from Step 5c</span>
-<span class="key">service_id</span>    = <span class="val">srv_xxxxx...</span>        <span class="comment"># from Step 5c</span>
+<span class="key">api_key</span>       = <span class="val">rnd_xxxxx...</span>        <span class="comment"># Render → Account Settings → API Keys</span>
+<span class="key">service_id</span>    = <span class="val">srv_xxxxx...</span>        <span class="comment"># Render → your service URL → srv_xxx part</span>
+
+<span class="key">[google]</span>
+<span class="key">sheet_id</span>             = <span class="val">1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms</span>   <span class="comment"># from Sheet URL (Step 5)</span>
+<span class="key">service_account_json</span> = <span class="val">service_account.json</span>                             <span class="comment"># file in orb_alert folder</span>
 
 <span class="key">[scanner]</span>
 <span class="key">interval_seconds</span>  = <span class="val">300</span>
@@ -741,7 +745,7 @@
     <ol>
       <li>Validate all fields are filled</li>
       <li>Verify Telegram bot token is valid</li>
-      <li>Push all 16 env vars to Render via API</li>
+      <li>Push all 19 env vars to Render via API</li>
       <li>Trigger a redeploy</li>
       <li>Print your service URL</li>
     </ol>

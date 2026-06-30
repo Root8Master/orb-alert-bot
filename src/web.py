@@ -61,6 +61,7 @@ _state = {
     "errors":         [],
     "is_holiday":     False,
     "holiday_reason": None,
+    "started_at":     None,
 }
 
 
@@ -245,6 +246,7 @@ def startup():
         update_sl_fn  = update_sl,
     )
 
+    _state["started_at"] = datetime.now(IST).isoformat()
     threading.Thread(target=_main_loop, daemon=True).start()
 
 
@@ -265,7 +267,7 @@ def status():
     }
 
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD", "POST"])
 def health():
     return {"ok": True}
 
@@ -313,3 +315,26 @@ def pause():
 def resume():
     _cmd_module.scanner_paused = False
     return {"paused": False}
+
+
+@app.get("/debug")
+def debug():
+    """Full runtime state — use this when alerts aren't firing."""
+    from src.auth import _TOKEN
+    from src.alerts.dedup import _sent as dedup_keys
+    now = _hhmm()
+    in_window = "09:20" <= now <= "11:00"
+    return {
+        "time_ist":          now,
+        "in_scan_window":    in_window,
+        "scanner_paused":    _is_paused(),
+        "is_holiday":        _state["is_holiday"],
+        "holiday_reason":    _state["holiday_reason"],
+        "last_scan":         _state["last_run"],
+        "signals_today":     len(_state["signals"]),
+        "recent_errors":     _state["errors"][-10:],
+        "token_set":         bool(_TOKEN.get("access_token")),
+        "token_refreshed_at": _TOKEN.get("refreshed_at"),
+        "dedup_keys_today":  len(dedup_keys),
+        "uptime_since":      _state.get("started_at"),
+    }
